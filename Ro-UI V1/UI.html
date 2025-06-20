@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ro-Exploits Launcher</title>
+  <style>
+    body.light {
+      background-color: #f2f2f2;
+      color: #222;
+    }
+
+    body.dark {
+      background-color: #000;
+      color: #00ff00;
+    }
+
+    body {
+      margin: 0;
+      font-family: monospace;
+      overflow: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    #title-img, #step-1, #main-ui {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      top: 40%;
+      opacity: 0;
+      transition: all 2s ease-in-out;
+    }
+
+    #title-img.active {
+      opacity: 1;
+      top: 30%;
+      animation: spin 3s ease-in-out;
+    }
+
+    @keyframes spin {
+      0% { transform: rotateY(0deg) scale(0.5); opacity: 0; }
+      50% { transform: rotateY(180deg) scale(1.1); opacity: 1; }
+      100% { transform: rotateY(360deg) scale(1); opacity: 1; }
+    }
+
+    #step-1.show, #main-ui.show {
+      opacity: 1;
+      top: 10%;
+    }
+
+    img {
+      max-width: 300px;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    .gui-panel {
+      background: #fff;
+      color: #222;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      width: 400px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark .gui-panel {
+      background: #111;
+      color: #00ff00;
+    }
+
+    .gui-panel h2 {
+      margin-bottom: 20px;
+    }
+
+    .action-button {
+      background-color: #ddd;
+      color: #222;
+      font-weight: bold;
+      border: none;
+      padding: 12px 24px;
+      margin: 12px 0;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      width: 80%;
+    }
+
+    body.dark .action-button {
+      background-color: #00ff00;
+      color: black;
+    }
+
+    .action-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .gui-panel p {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body class="light">
+  <!-- Splash -->
+  <div id="title-img">
+    <img src="https://tr.rbxcdn.com/62041ec7521086af728cae3640e56753/420/420/Image/Png" alt="Yellow Head Splash">
+  </div>
+
+  <!-- Step 1 -->
+  <div id="step-1" style="display: none;">
+    <h2>Step 1: Install Roblox</h2>
+    <p>Click below to download the Roblox Player.</p>
+    <button class="action-button" onclick="goToDownload()">Install Roblox</button>
+  </div>
+
+  <!-- Main GUI -->
+  <div id="main-ui" style="display: none;">
+    <div class="gui-panel">
+      <h2>Ro-Exploits Control</h2>
+      <button class="action-button" onclick="runAction('inject')">Inject</button>
+      <button class="action-button" onclick="runAction('bypass')">Bypass</button>
+      <button class="action-button" onclick="runAction('terminate')">Terminate</button>
+      <button class="action-button" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+    </div>
+  </div>
+
+  <script>
+    window.onload = function () {
+      const titleImg = document.getElementById('title-img');
+      titleImg.classList.add('active');
+
+      setTimeout(() => {
+        checkRobloxInstalled();
+      }, 3000);
+    };
+
+    function checkRobloxInstalled() {
+      const startTime = Date.now();
+      const timeout = 1500;
+
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = 'roblox://';
+      document.body.appendChild(iframe);
+
+      setTimeout(() => {
+        const timeDiff = Date.now() - startTime;
+        const robloxInstalled = timeDiff < timeout + 100;
+        document.body.removeChild(iframe);
+        showNextStep(robloxInstalled);
+      }, timeout);
+    }
+
+    function showNextStep(hasRoblox) {
+      document.getElementById('title-img').style.display = 'none';
+      if (hasRoblox) {
+        document.getElementById('main-ui').style.display = 'block';
+        document.getElementById('main-ui').classList.add('show');
+      } else {
+        document.getElementById('step-1').style.display = 'block';
+        document.getElementById('step-1').classList.add('show');
+      }
+    }
+
+    function goToDownload() {
+      window.open('https://www.roblox.com/download', '_blank');
+      document.getElementById('step-1').style.display = 'none';
+      document.getElementById('main-ui').style.display = 'block';
+      document.getElementById('main-ui').classList.add('show');
+    }
+
+    function runAction(action) {
+      const guiPanel = document.querySelector('.gui-panel');
+
+      if (action === 'inject') {
+        const msg = document.createElement('p');
+        msg.textContent = 'Payload Injected.';
+        guiPanel.appendChild(msg);
+      }
+
+      if (action === 'bypass') {
+        const msg = document.createElement('p');
+        msg.textContent = 'Bypass Attempted...';
+        guiPanel.appendChild(msg);
+        document.body.style.backgroundColor = getComputedStyle(document.body).getPropertyValue('--bg') || '#e0e0e0';
+      }
+
+      if (action === 'terminate') {
+        document.body.innerHTML = '<h1 style="color:red; text-align:center; margin-top:20%;">Session Terminated.</h1>';
+      }
+    }
+
+    function toggleDarkMode() {
+      const body = document.body;
+      body.classList.toggle('dark');
+      body.classList.toggle('light');
+    }
+  </script>
+</body>
+</html>
